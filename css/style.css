@@ -1,0 +1,181 @@
+*{
+    font-family: 'Roboto', sans-serif;
+}
+
+.wrapper li{
+    float: right;
+    margin: 15px;
+}
+
+.dropArrow{
+    margin-left: 85%;
+    margin-top: -10px;
+    align-items: center;
+    color: white;
+}
+
+.wrapper{
+    text-align: right;
+    border: solid 0.3em rgba(0, 0, 0, 0);
+    border-bottom-color: rgb(16, 5, 5);
+    border-width: thin;
+}
+
+.wrapper a{
+    float: right;
+    /*color: rgb(10, 1, 1);*/
+}
+
+
+.wrapper a:hover{
+    color: blue;
+}
+
+.wrapper h2{
+    /*color: rgb(6, 3, 3);*/
+    text-align: center;
+}
+.text-to-change{
+    color: black;
+}
+.whiteText{
+    color: white;
+}
+body{
+    color: black;
+    background-color: white;
+}
+
+button{
+    cursor: pointer;
+    text-align: center;
+    border: transparent;
+    background-color: transparent;
+}
+.darkButton{
+    margin-top: -40px;
+}
+
+.dark{
+    background-color: #222;
+    color: #e6e6e6;
+}
+
+
+ul{
+    list-style-type: none;
+}
+
+.sidebar {
+    height: 100%;
+    width: 160px;
+    margin-top: 5.027%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #11111108;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+.sidebar a {
+    padding: 15px 8px 6px 16px;
+    text-decoration: none;
+    color: #818181;
+    display: block;
+}
+
+.sidebar a #top-sidebar{
+    font-size: 20px;
+}
+.sidebar a #bottom-sidebar{
+    font-size: 10px;
+    color: #818181;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    margin-bottom: 10px;
+    background-color: gray;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    width: 150px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+}
+.dropdown-content {
+    display: none;
+    border-radius: 8px;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+    border-radius: 8px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: rgb(74, 74, 74);
+}
+  
+p{
+    /*color: white;*/
+    text-align: center;
+    margin: 50px;
+    padding: 15px;
+}
+.signup-form button,
+.signup-form input{
+    margin: 0 50%;
+    padding: 10px 5px 5px 10px;
+    transition: all 0.6s ease;
+    border-radius: 8px;
+    text-align: left;
+    margin-bottom: 5px;
+    border-color: gray;
+}
+
+.login-form button,
+.login-form input{    
+    margin: 0 50%;
+    padding: 10px 5px 5px 10px;
+    transition: all 0.6s ease;
+    border-radius: 8px;
+    display: flex;
+    border-color: gray;
+    margin-bottom: 5px;
+    text-align: left;
+}
+.login-form-form,
+.signup-form-form{
+    margin: 0;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+
+}
