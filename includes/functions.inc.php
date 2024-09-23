@@ -32,39 +32,34 @@ function pwdMatch($pwd, $pwdr) {
 }
 function UIDExists($connection, $uid, $email) {
     $maria = "SELECT * FROM bank_user WHERE UID = ? or email = ?;";
-    $statement = mysqli_stmt_init($connection);
-    if (!mysqli_stmt_prepare($statement, $maria)) {
+    $statement = $connection->prepare($maria); 
+    if (!$statement) {
         header("location: ../signup.php?statementFailed");
         exit();
     }
+    $statement->execute([$uid, $email]);
 
-    mysqli_stmt_bind_param($statement, "ss", $uid, $email);
-    mysqli_stmt_execute($statement);
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
 
-    $resultData = mysqli_stmt_get_result($statement);
-    if ($row = mysqli_fetch_assoc($resultData)) {
+    if ($row) {
         return $row;
     } else {
         $result = false;
         return $result;
     }
-
-    mysqli_stmt_close($statement);
-
 }
 function createUser($connection, $first_name, $last_name, $email, $uid, $dob, $address, $phone, $pwd) {
     $maria = "INSERT INTO bank_user (first_name, last_name, email, uid, dob, address, phone, pwd) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    $statement = mysqli_stmt_init($connection);
-    if (!mysqli_stmt_prepare($statement, $maria)) {
+    $statement = $connection->prepare($maria); 
+    if (!$statement) {
         header("location: ../signup.php?statementFailed");
         exit();
     }
 
     $hashedPwd= password_hash($pwd, PASSWORD_DEFAULT);
 
-    mysqli_stmt_bind_param($statement, "ssssssss", $first_name, $last_name, $email, $uid, $dob, $address, $phone, $hashedPwd);
-    mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
+    $statement = $connection->prepare($maria);
+    $statement->execute([$first_name, $last_name, $email, $uid, $dob, $address, $phone, $hashedPwd]);
 
     header("location: ../index.php?error=none");
     exit();
@@ -105,24 +100,47 @@ function loginUser($connection, $uid, $pwd) {
     }
 }
 
-function createAccount($connection, $amt, $routing, $type){
-    #           TO DO's
-    # CHECK IF A ACCOUNT ALREADY EXISTS TO GET ROUTING NUMBER 
-    # ELSE CHECK IF THE RANDOMLY GENERATE ROUTING NUMBER IS AVAILABLE
-    # GET HIGHEST ACCOUNT NUMBER AND +1 IT FOR NEW ACCOUNT
-    # CREATE NEW ROW FOR TABLE AND INSERT
+function createAccount($connection, $amt, $accname, $type){
     session_start();
-    # CURRENTLY DOES NOT FULLY WORK
     $accnum = 1;
     $uid = $_SESSION['uid'];
     
-    $checking_query = "SELECT * FROM account WHERE uid = '$uid' and type='checking' and accnum='$accnum'";
-    $saving_query = "SELECT * FROM account WHERE uid = '$uid' and type='saving' and accnum='$accnum'";
+    $checking_query = "SELECT * FROM account WHERE uid = '$uid' and type='Checking' and accnum='$accnum'";
+    $saving_query = "SELECT * FROM account WHERE uid = '$uid' and type='Saving' and accnum='$accnum'";
     $result = $connection->query($checking_query);
-    $row1 = $result->fetch_assoc();
+    $row1 = $result->fetch(PDO::FETCH_ASSOC);
     $result = $connection->query($saving_query);
-    $row2 = $result->fetch_assoc();
-    $checkingNotNull = false;
+    $row2 = $result->fetch(PDO::FETCH_ASSOC);
+    if( (is_null($row1['accnum']) && ($type == 'Checking'))
+        || (is_null($row2['accnum']) && ($type == 'Saving'))) {
+
+        $query = "INSERT INTO account (uid, type, amt, accnum, accname) VALUES (?, ?, ?, ?, ?)";
+        $statement = $connection->prepare($query); 
+        $statement->execute([$uid, $type, $amt, $accnum, $accname]);
+        updateTransactions($connection, $amt, $uid, "Deposit", $type);
+        header("location: ../bankAccount.php?error=none");
+        exit();
+    } else {
+        $accnum = 2;
+        $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
+        $result = $connection->query($query);
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+        while ($row) {
+            $accnum += 1;
+            $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
+            $result = $connection->query($query);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+        }
+        $query = "INSERT INTO account (uid, type, amt, accnum, accname) VALUES (?, ?, ?, ?, ?)";
+        $statement = $connection->prepare($query); 
+        $statement->execute([$uid, $type, $amt, $accnum, $accname]);
+
+        updateTransactions($connection, $amt, $uid, "Deposit", $type);
+
+        header("location: ../bankAccount.php?error=none");
+        exit();
+    }
+    /*$checkingNotNull = false;
     $savingNotNull = false;
     if(isset($row1['routing'])) {
         $routing = $row1['routing'];
@@ -133,19 +151,20 @@ function createAccount($connection, $amt, $routing, $type){
         $savingNotNull = true;
     }
 
-    if (($savingNotNull === false && $checkingNotNull === false) || ($checkingNotNull === true && $savingNotNull === false && $type === 'saving') 
-    || ($checkingNotNull === false && $savingNotNull === true && $type === 'checking')) {
+    if (($savingNotNull === false && $checkingNotNull === false) || ($checkingNotNull === true && $savingNotNull === false && $type === 'Saving') 
+    || ($checkingNotNull === false && $savingNotNull === true && $type === 'Checking')) {
         $query = "INSERT INTO account (uid, type, amt, accnum, routing) VALUES (?, ?, ?, ?, ?)";
         $statement = mysqli_stmt_init($connection);
         mysqli_stmt_prepare($statement, $query);
         mysqli_stmt_bind_param($statement, "sssss", $uid, $type, $amt, $accnum, $routing);
         mysqli_stmt_execute($statement);
         mysqli_stmt_close($statement);
-    
+
+        updateTransactions($connection, $amt, $uid, "Deposit", $type);
         header("location: ../bankAccount.php?error=none");
         exit();
     }
-    if (($checkingNotNull === true && $savingNotNull === false && $type === 'checking') || ($checkingNotNull === false && $savingNotNull === true && $type==='saving')
+    if (($checkingNotNull === true && $savingNotNull === false && $type === 'Checking') || ($checkingNotNull === false && $savingNotNull === true && $type==='Saving')
     || ($checkingNotNull === true && $savingNotNull === true)) {
         $accnum = 2;
         $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
@@ -163,10 +182,30 @@ function createAccount($connection, $amt, $routing, $type){
         mysqli_stmt_bind_param($statement, "sssss", $uid, $type, $amt, $accnum, $routing);
         mysqli_stmt_execute($statement);
         mysqli_stmt_close($statement);
-    
+        
+        updateTransactions($connection, $amt, $uid, "Deposit", $type);
         header("location: ../bankAccount.php?error=none");
         exit();
-    }
+    }*/
     header("location: ../bankAccount.php?error='$uid'");
     exit();
+}
+
+function updateTransactions($connection, $amt, $uid, $transType, $accType) {
+    $pending = 'Pending';
+    $date = date("m/d/Y");
+    $otherAcc = "Self";
+    $query = "INSERT INTO transactions (uid, OtherAccNum, Trans_Type, Acc_Type, amt, timeStamp, pending) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $statement = $connection->prepare($query); 
+    $statement->execute([$uid, $otherAcc, $transType, $accType, $amt, $date, $pending]);
+    /*$statement = mysqli_stmt_init($connection);
+    mysqli_stmt_prepare($statement, $query);
+    mysqli_stmt_bind_param($statement, "ssssis", $uid, $otherAcc, $transType, $accType, $amt, $date);
+    mysqli_stmt_execute($statement);
+    mysqli_stmt_close($statement);*/
+}
+
+function depositMoney($connection, $amt, $account){
+    $currentMoney = "SELECT * FROM account WHERE accname='$account'";
+    $otherAcc = "Self";
 }

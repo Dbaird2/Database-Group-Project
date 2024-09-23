@@ -24,7 +24,8 @@ body{
 
 .wrapper li{
     float: right;
-    margin: 15px;
+    margin: 1%;
+    margin-left: -2%;
 }
 
 .dropArrow{
@@ -43,6 +44,7 @@ body{
 
 .wrapper a{
     float: right;
+    font-size: 15px;
 }
 
 
@@ -73,8 +75,7 @@ ul{
 
 .sidebar {
     height: 100%;
-    width: 160px;
-    margin-top: 5.027%;
+    width: 100px;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -85,10 +86,12 @@ ul{
 }
 
 .sidebar a {
+    margin-top: 745%;
     padding: 15px 8px 6px 16px;
     text-decoration: none;
     color: #818181;
     display: block;
+    
 }
 
 .dropdown {
@@ -142,16 +145,16 @@ p{
 .front-display{
     width: 88%;
     height: 70vh;
-    background-image: url("../father-daughter-img.png");
+    background-image: url("../download.jpg");
     background-size: cover;
+    background-position: center;
     background-repeat: no-repeat; 
-    background-position: top;
     border-radius: 20px;
     position: relative;
     left: 165px;
     top: 40px;
     padding: 15px;
-    color: rgba(126, 78, 6, 0.719)
+    color: #0077b6;
 }
 
 .front-display h5{
@@ -168,20 +171,31 @@ nav {
     padding: 10px 0;
     text-align: center;
 }
-
+.stuff a{
+    color: #0077b6;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin: 0 15px;
+    margin-left: 15%;
+}
+.stuff{
+    margin: 0 15px;
+    padding: 10px 0;
+    text-align: center;
+}
 nav a {
-    color: white;
+    color: black;
     margin: 0 15px;
     text-decoration: none;
     font-size: 1.2rem;
 }
 
 section {
-    max-width: 1200px;
+    max-width: 70%;
     margin: 30px auto;
     padding: 20px;
     background-color: white;
-    border-radius: 8px;
+    border-radius   : 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -206,4 +220,85 @@ footer {
     width: 100%;
     bottom: 0;
     height: 10%;
+}
+.transaction-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    height: 100px; 
+    padding: 10px;
+}
+
+.top-left {
+    grid-area: 1 / 1;
+    text-align: left;
+    color: #0077b6;
+
+}
+
+.top-right {
+    grid-area: 1 / 2;
+    text-align: right;
+    color: #0077b6;
+}
+
+.bottom-left {
+    grid-area: 2 / 1;
+    text-align: left;
+}
+
+.bottom-right {
+    grid-area: 2 / 2;
+    text-align: right;
+}
+#trans-hist{
+    width: 60%;
+    margin-bottom: -1%;
+}
+
+#transactions p{
+    margin-bottom: -4%;
+    margin-top: -1%;
+    color: #0077b6;
+}
+
+#accountInfo .info{
+    margin: 100px auto;
+    margin-bottom: 1%;
+}
+#accountInfo .elements{
+    margin-bottom: 2%;
+}
+#accountInfo h2{
+    margin-bottom: -3%;
+    margin-top: -4%;
+}
+#accountInfo{
+    margin-top: 2%;
+}
+#transfer a,
+#transactions a{
+    text-decoration: none;
+}
+#checking ul{
+    list-style: none;
+}
+#checking li a{
+    text-decoration: none;
+    color: black;
+    font-size: large;
+    margin-top: 100%;
+}
+.deposit-h2 h2{
+    text-align: center;
+}
+#accountInfo a{
+    text-align: center;
+    text-decoration: none;
+    color: #0077b6;
+    position: absolute;
+    top: 50%;
+    left: 75%;
 }

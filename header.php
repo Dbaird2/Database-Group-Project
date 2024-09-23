@@ -22,6 +22,7 @@
                         echo "<li><a class='text-to-change' href='logout.php'>Logout</a></li>";
                         echo "<li><a class='text-to-change' href='account.php'>Account</a></li>";
                         echo "<li><a class='text-to-change' href='bankAccount.php'>Bank Accounts</a></li>";
+                        echo "<li><a class='text-to-change' href='banking.php'>Banking</a></li>";
                     } else {
                         echo "<li><a class='text-to-change' href='login.php'>Login</a></li>";
                         echo "<li><a class='text-to-change' href='signup.php'>Signup</a></li>";
