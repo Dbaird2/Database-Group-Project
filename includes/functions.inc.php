@@ -61,7 +61,7 @@ function createUser($connection, $first_name, $last_name, $email, $uid, $dob, $a
     $statement = $connection->prepare($maria);
     $statement->execute([$first_name, $last_name, $email, $uid, $dob, $address, $phone, $hashedPwd]);
 
-    header("location: ../index.php?error=none");
+    header("location: ../login.php?error=none");
     exit();
 
 }
@@ -102,32 +102,31 @@ function loginUser($connection, $uid, $pwd) {
 
 function createAccount($connection, $amt, $accname, $type){
     session_start();
-    $accnum = 1;
+    $accnum = mt_rand(10000000,99999999);
     $uid = $_SESSION['uid'];
     
-    $checking_query = "SELECT * FROM account WHERE uid = '$uid' and type='Checking' and accnum='$accnum'";
-    $saving_query = "SELECT * FROM account WHERE uid = '$uid' and type='Saving' and accnum='$accnum'";
+    $checking_query = "SELECT * FROM account WHERE accnum='$accnum'";
+    //$saving_query = "SELECT * FROM account WHERE uid = '$uid' and type='Saving' and accnum='$accnum'";
     $result = $connection->query($checking_query);
     $row1 = $result->fetch(PDO::FETCH_ASSOC);
-    $result = $connection->query($saving_query);
-    $row2 = $result->fetch(PDO::FETCH_ASSOC);
-    if( (is_null($row1['accnum']) && ($type == 'Checking'))
-        || (is_null($row2['accnum']) && ($type == 'Saving'))) {
+    //$result = $connection->query($saving_query);
+    //$row2 = $result->fetch(PDO::FETCH_ASSOC);
+    if (is_null($row1)) {
 
         $query = "INSERT INTO account (uid, type, amt, accnum, accname) VALUES (?, ?, ?, ?, ?)";
         $statement = $connection->prepare($query); 
         $statement->execute([$uid, $type, $amt, $accnum, $accname]);
-        updateTransactions($connection, $amt, $uid, "Deposit", $type);
+        updateTransactions($connection, $amt, $uid, "Deposit", $type, $accnum);
         header("location: ../bankAccount.php?error=none");
         exit();
     } else {
-        $accnum = 2;
-        $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
+        $accnum = mt_rand(10000000,99999999);
+        $query = "SELECT * FROM account WHERE accnum='$accnum'";
         $result = $connection->query($query);
         $row = $result->fetch(PDO::FETCH_ASSOC);
         while ($row) {
-            $accnum += 1;
-            $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
+            $accnum = mt_rand(10000000,99999999);
+            $query = "SELECT * FROM account WHERE accnum='$accnum'";
             $result = $connection->query($query);
             $row = $result->fetch(PDO::FETCH_ASSOC);
         }
@@ -135,7 +134,7 @@ function createAccount($connection, $amt, $accname, $type){
         $statement = $connection->prepare($query); 
         $statement->execute([$uid, $type, $amt, $accnum, $accname]);
 
-        updateTransactions($connection, $amt, $uid, "Deposit", $type);
+        updateTransactions($connection, $amt, $uid, "Deposit", $type, $accnum);
 
         header("location: ../bankAccount.php?error=none");
         exit();
@@ -191,18 +190,13 @@ function createAccount($connection, $amt, $accname, $type){
     exit();
 }
 
-function updateTransactions($connection, $amt, $uid, $transType, $accType) {
+function updateTransactions($connection, $amt, $uid, $transType, $accType, $accnum) {
     $pending = 'Pending';
     $date = date("m/d/Y");
     $otherAcc = "Self";
-    $query = "INSERT INTO transactions (uid, OtherAccNum, Trans_Type, Acc_Type, amt, timeStamp, pending) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO transactions (uid, OtherAccNum, Trans_Type, Acc_Type, amt, timeStamp, pending, accnum) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $statement = $connection->prepare($query); 
-    $statement->execute([$uid, $otherAcc, $transType, $accType, $amt, $date, $pending]);
-    /*$statement = mysqli_stmt_init($connection);
-    mysqli_stmt_prepare($statement, $query);
-    mysqli_stmt_bind_param($statement, "ssssis", $uid, $otherAcc, $transType, $accType, $amt, $date);
-    mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);*/
+    $statement->execute([$uid, $otherAcc, $transType, $accType, $amt, $date, $pending, $accnum]);
 }
 
 function depositMoney($connection, $amt, $account){

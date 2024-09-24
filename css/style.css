@@ -6,7 +6,7 @@ body{
     animation: fadeInAnimation ease 1s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
@@ -73,9 +73,9 @@ ul{
     list-style-type: none;
 }
 
-.sidebar {
-    height: 100%;
-    width: 100px;
+/*.sidebar {
+    height: 90%;
+    width: 5%;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -92,7 +92,7 @@ ul{
     color: #818181;
     display: block;
     
-}
+}*/
 
 .dropdown {
     position: relative;
@@ -214,12 +214,16 @@ p {
 footer {
     background-color: #0077b6;
     color: white;
-    padding: -50px 0;
+    padding: -800% 0;
     text-align: center;
     position: fixed;
     width: 100%;
     bottom: 0;
-    height: 10%;
+    height: 9%;
+}
+footer p{
+    position: relative;
+    top: -40%;
 }
 .transaction-section {
     display: grid;

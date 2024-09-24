@@ -1,7 +1,6 @@
 <?php
 
 include_once ("header.php");
-include_once ("sidebar.php");
 ?>
 <div class="deposit-h2">
     <h2>A <b>minimum</b> of <b>$1</b> must be deposited</h2>

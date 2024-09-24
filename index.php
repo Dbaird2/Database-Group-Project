@@ -1,6 +1,5 @@
 <?php
     include("header.php");
-    include_once("sidebar.php");
 ?>
     <div class="front-display">
         <h1>What is financial health?</h1>

@@ -1,6 +1,5 @@
 <?php
     include_once ("header.php");
-    include_once ("sidebar.php");
     require_once 'includes/dbms.inc.php';
 
 ?>

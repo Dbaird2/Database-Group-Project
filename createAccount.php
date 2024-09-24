@@ -1,8 +1,7 @@
 <?php
     include_once ("header.php");
-    include_once ("sidebar.php");
 ?>
-<p>Opening a <b>Savings account</b> requires a minimum of $100 deposit. <b>Both account type</b> have a max deposit of <b>$1,000</b></p>
+<p>Opening a <b>Savings account</b> requires a minimum of $100 deposit. <b>Both account types</b> have a max deposit of <b>$1,000</b> when creating the account</p>
 <section id="create-page" >
     <h2>Create Checking Account</h2>
     <ul>

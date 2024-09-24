@@ -45,28 +45,6 @@ try {
         $err = $error->getMessage();
         echo "$err";
     }
-
-    try {
-        $result = $connection->query("SHOW TABLES LIKE 'transactions';");
-        if ($result->rowCount() > 0) {
-        } else {
-            $transaction_info = "CREATE TABLE transactions (
-            uid VARCHAR(50),
-            Trans_ID INT(6) AUTO_INCREMENT PRIMARY KEY,
-            OtherAccNum VARCHAR(15) NOT NULL,
-            Trans_Type VARCHAR(15) NOT NULL,
-            Acc_Type VARCHAR(15) NOT NULL,
-            amt INT(15) NOT NULL,
-            timeStamp VARCHAR(25) NOT NULL,
-            pending VARCHAR(20) NOT NULL,
-            FOREIGN KEY (uid) REFERENCES bank_user(uid)
-            )";
-            $connection->exec($transaction_info);
-        }
-    } catch (PDOException) {
-        $err = $error->getMessage();
-        echo "$err";
-    }
     
     try {
         $result = $connection->query("SHOW TABLES LIKE 'account';");
@@ -83,6 +61,30 @@ try {
             $connection->exec($account_info);
         }
     } catch (PDOException $error) {
+        $err = $error->getMessage();
+        echo "$err";
+    }
+
+    try {
+        $result = $connection->query("SHOW TABLES LIKE 'transactions';");
+        if ($result->rowCount() > 0) {
+        } else {
+            $transaction_info = "CREATE TABLE transactions (
+            uid VARCHAR(50),
+            Trans_ID INT(6) AUTO_INCREMENT PRIMARY KEY,
+            OtherAccNum VARCHAR(15) NOT NULL,
+            Trans_Type VARCHAR(15) NOT NULL,
+            Acc_Type VARCHAR(15) NOT NULL,
+            amt INT(15) NOT NULL,
+            timeStamp VARCHAR(25) NOT NULL,
+            pending VARCHAR(20) NOT NULL,
+            accnum INT(10),
+            FOREIGN KEY (accnum) REFERENCES account(accnum),
+            FOREIGN KEY (uid) REFERENCES bank_user(uid)
+            )";
+            $connection->exec($transaction_info);
+        }
+    } catch (PDOException) {
         $err = $error->getMessage();
         echo "$err";
     }
