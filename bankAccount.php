@@ -14,26 +14,18 @@ try {
         <?php
         $uid = $_SESSION['uid'];
         if(isset($uid)) {
+            $nRows = $connection->query("SELECT COUNT(*) FROM account WHERE uid='$uid' AND type='Checking'")->fetchColumn(); 
             $query = "SELECT * FROM account WHERE uid = :uid AND type='Checking'";
             $statement = $connection->prepare($query);
             $statement->bindParam(':uid', $uid);
             $statement->execute();
             $row = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $i = 0;
-            while ($row[$i]) {
-
+            for($i = 0; $i < $nRows; $i++) {
                 echo "<section id='checking' class='account-section'>";
-                if ($row) {
+                if ($row[$i]) {
                     $accname = $row[$i]['accname'];
                     echo "<h2>$accname Account</h2>";
-                }
-                    
-                if (!$row) {
-                    echo "<h2>Checking Account</h2>";
-                    echo "<ul>";
-                    echo "<li><b>You have not yet made a checking account.</b></li>";
-                    break;
-                } else {
+
                     echo "<ul>";
                     $checkingBalance = $row[$i]['amt'];
                     echo "<li style='margin-bottom:1%'><b>Balance: $$checkingBalance</b></li>";
@@ -42,9 +34,15 @@ try {
                     $acctype = $row[$i]['type'];
                     echo "<li><b>Account Type:</b> $acctype</li>";
                 }
+                    
+                if (!$row) {
+                    echo "<h2>Checking Account</h2>";
+                    echo "<ul>";
+                    echo "<li><b>You have not yet made a checking account.</b></li>";
+                    break;
+                }
                 echo "</ul>";
                 echo "</section>";
-                $i++;
             }
         }
             ?>
@@ -59,15 +57,7 @@ try {
                 if ($row){
                     $accname = $row['accname'];
                     echo "<h2>$accname Account</h2>";
-                }
-            
-                #$savingBalance =$row['amt'];
-                if (!$row) {
-                    echo "<h2>Saving Account</h2>";
-                    echo "<ul>";
 
-                    echo "<li><b>You have not yet made a savings account.</b></li>";
-                } else {
                     echo "<ul>";
                     $savingBalance =$row['amt'];
                     echo "<li style='margin-bottom:1%'><b>Balance: $$savingBalance</b></li>";
@@ -75,6 +65,11 @@ try {
                     echo "<li style='margin-bottom:1%'><b>Account Number:</b> $accnum</li>";
                     $acctype = $row['type'];
                     echo "<li><b>Account Type:</b> $acctype</li>";
+                }   else if (!$row) {
+                    echo "<h2>Saving Account</h2>";
+                    echo "<ul>";
+
+                    echo "<li><b>You have not yet made a savings account.</b></li>";
                 }
             } else {
                 echo "<li><b>Error getting saving account information please do not call</b></li>";
