@@ -1,5 +1,9 @@
 <?php
-    session_start();
+session_start();
+require_once "includes/dbms.inc.php";
+$query = $connection->prepare("select * from bank_info");
+$query->execute();
+$row = $query->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -13,22 +17,65 @@
 </head>
 <body>
     <nav>
-        <div class="wrapper">
-        <h2>Bank of Student Debt <i class='bx bxs-bank'></i></h2>  
+        <div style="margin-right:1%;" class="wrapper">
+        <h2><?php echo $row['bank_name'];?><i class='bx bxs-bank'></i></h2>  
             <ul>
 
-                <?php
-                if (isset($_SESSION['id'])) {
-                        echo "<li><a class='text-to-change' href='logout.php'>Logout</a></li>";
-                        echo "<li><a class='text-to-change' href='account.php'>Account</a></li>";
-                        echo "<li><a class='text-to-change' href='bankAccount.php'>Bank Accounts</a></li>";
-                        echo "<li><a class='text-to-change' href='banking.php'>Banking</a></li>";
-                    } else {
-                        echo "<li><a class='text-to-change' href='login.php'>Login</a></li>";
-                        echo "<li><a class='text-to-change' href='signup.php'>Signup</a></li>";
-                    }
-                ?>
-                <li><a class="text-to-change" href="index.php">Home</a></li>
+<?php
+if (isset($_SESSION['id'])) {
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='logout.php'>Logout</a></li>";
+    
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='account.php'>Account</a></li>";
+    
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0; margin-left:-3vh;'><a href='bankAccount.php'>Bank Accounts</a></li>";
+    
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='banking.php'>Banking</a></li>";
+    
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='aboutUs.php'> About Us</a></li>";
+} else {
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='login.php'>Login</a></li>";
+
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='signup.php'>Signup</a></li>";
+
+    echo "<li style='display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;'><a href='aboutUs.php'> About Us</a></li>";
+}
+?>
+                <li style="display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;"><a href="index.php">Home</a></li>
+                
+<?php
+if (isset($_SESSION['admin']) && $_SESSION['admin'] != FALSE) {
+    echo "<li style='float:left;'><a href='admin.php'>Admin</a></li>";
+}
+?>
             </ul>
         </div>
     </nav>
+
+
