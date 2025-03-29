@@ -1,12 +1,13 @@
 *{
     font-family: 'Roboto', sans-serif;
+    font-size:0.95vw;
 }
 
 body{
     animation: fadeInAnimation ease 1s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
@@ -23,30 +24,29 @@ body{
 }
 
 .wrapper li{
-    float: right;
-    margin: 15px;
-}
-
-.dropArrow{
-    margin-left: 85%;
-    margin-top: -10px;
-    align-items: center;
-    color: white;
+    float: inline-end;
+    display: flex;
+    justify-content: space-evenly; 
+    padding: 0;
+    margin: 0;
+    
 }
 
 .wrapper{
     text-align: right;
     border: solid 0.3em rgba(0, 0, 0, 0);
-    border-bottom-color: rgb(16, 5, 5);
     border-width: thin;
 }
 
 .wrapper a{
+    text-wrap: nowrap;
     float: right;
+    font-size: 100%;
+    width: 30%;
 }
 
 
-.wrapper a:hover{
+a:hover{
     color: blue;
 }
 
@@ -69,26 +69,6 @@ button{
 
 ul{
     list-style-type: none;
-}
-
-.sidebar {
-    height: 100%;
-    width: 160px;
-    margin-top: 5.027%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #11111108;
-    overflow-x: hidden;
-    padding-top: 20px;
-}
-
-.sidebar a {
-    padding: 15px 8px 6px 16px;
-    text-decoration: none;
-    color: #818181;
-    display: block;
 }
 
 .dropdown {
@@ -118,40 +98,58 @@ p{
     border-color: gray;
 }
 
-.login-form button,
-.login-form input{    
-    margin: 0 0%;
-    padding: 10px 5px 5px 10px;
-    transition: all 0.6s ease;
-    border-radius: 8px;
-    display: flex;
-    border-color: gray;
-    font-size: medium;
+h2 {
+    text-align: center;
+    color: #333333;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    font-weight: bold;
+    color: #666666;
+    display: block;
     margin-bottom: 5px;
-    text-align: left;
+}
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
 }
 .login-form-form,
 .signup-form-form{
-    margin: 0;
-    display: flex;
-    align-items: center; 
-    justify-content: center;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
 }
 
 .front-display{
     width: 88%;
     height: 70vh;
-    background-image: url("../father-daughter-img.png");
+    background-image: url("../Untitled.jpg");
     background-size: cover;
+    background-position: center;
     background-repeat: no-repeat; 
-    background-position: top;
-    border-radius: 20px;
     position: relative;
-    left: 165px;
-    top: 40px;
-    padding: 15px;
-    color: rgba(126, 78, 6, 0.719)
+    left: 1vh;
+    top: 4vh;
+    color: #0077b6;
 }
 
 .front-display h5{
@@ -165,23 +163,33 @@ header h1 {
 nav,
 nav {
     background-color: #023e8a;
+    text-align: center;
+}
+.stuff a{
+    color: #0077b6;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin: 0 15px;
+    margin-left: 15%;
+}
+.stuff{
+    margin: 0 15px;
     padding: 10px 0;
     text-align: center;
 }
-
 nav a {
-    color: white;
+    color: black;
     margin: 0 15px;
     text-decoration: none;
     font-size: 1.2rem;
 }
 
 section {
-    max-width: 1200px;
+    max-width: 70%;
     margin: 30px auto;
     padding: 20px;
     background-color: white;
-    border-radius: 8px;
+    border-radius   : 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -200,10 +208,103 @@ p {
 footer {
     background-color: #0077b6;
     color: white;
-    padding: -50px 0;
+    padding: -800% 0;
     text-align: center;
     position: fixed;
     width: 100%;
     bottom: 0;
-    height: 10%;
+    
+    height: 8%;
 }
+footer p{
+    position: relative;
+    top: -40%;
+}
+footer a {
+    position: relative;
+    top: -40%;
+    left: 60%;
+}
+.transaction-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    font-size:0.85vw;
+    width: 100%;
+    height:80%;
+    padding: 10px;
+}
+
+.top-left {
+    grid-area: 1 / 1;
+    text-align: left;
+    color: #0077b6;
+
+}
+
+.top-right {
+    grid-area: 1 / 2;
+    text-align: right;
+    color: #0077b6;
+}
+
+.bottom-left {
+    grid-area: 2 / 1;
+    text-align: left;
+    font-size:2em;   
+}
+
+.bottom-right {
+    grid-area: 2 / 2;
+    text-align: right;
+}
+#trans-hist{
+    width: 70%;
+}
+
+#transactions p{
+    margin-bottom: -4%;
+    margin-top: -1%;
+    color: #0077b6;
+}
+
+#accountInfo .info{
+    margin: 100px auto;
+    margin-bottom: 1%;
+}
+#accountInfo .elements{
+    margin-bottom: 2%;
+}
+#accountInfo h2{
+    margin-bottom: -3%;
+    margin-top: -4%;
+}
+#accountInfo{
+    margin-top: 2%;
+}
+#transfer a,
+#transactions a{
+    color:#0077b6;
+    text-decoration: none;
+}
+#checking ul{
+    list-style: none;
+}
+#checking li a{
+    text-decoration: none;
+    color: black;
+    font-size: large;
+    margin-top: 100%;
+}
+.deposit-h2 h2{
+    text-align: center;
+}
+#accountInfo a {
+    text-decoration:none;
+    color:black;
+}
+nav .changeInfo {
+    display:flex;
+    flex-direction:column;
+}
+

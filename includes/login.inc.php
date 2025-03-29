@@ -10,7 +10,7 @@ if(isset($_POST["submit"])) {
         header("location: ../login.php?error=emptyInput");
         exit();
     }
-
+    
     loginUser($connection, $uid, $pwd);
 } else {
     header("location: ../login.php");

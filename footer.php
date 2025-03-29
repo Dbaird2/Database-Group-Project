@@ -1,5 +1,5 @@
 <footer>
-    <p>&copy; 2024 Bank of Student Debt. All Rights Reserved.</p>
+    <p>&copy; 2024 Student Credit Union. All Rights Reserved.</p>
 </footer>
 </body>
 </html>

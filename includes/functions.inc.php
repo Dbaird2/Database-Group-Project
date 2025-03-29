@@ -18,8 +18,13 @@ function invalidUID($uid) {
     return $result;
 }
 function invalidEmail($email) {
-    $result = filter_var($email, FILTER_VALIDATE_EMAIL);
-    return $result === false;
+    if ($result = filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $result = false;
+        return $result;
+    } else {
+        $result = true;
+        return true;
+    }
 }
 function pwdMatch($pwd, $pwdr) {
     $result = NULL;
@@ -31,42 +36,51 @@ function pwdMatch($pwd, $pwdr) {
     return $result;
 }
 function UIDExists($connection, $uid, $email) {
-    $maria = "SELECT * FROM bank_user WHERE UID = ? or email = ?;";
-    $statement = mysqli_stmt_init($connection);
-    if (!mysqli_stmt_prepare($statement, $maria)) {
+    $maria = "SELECT * FROM ActiveBankAccounts WHERE uid = ? or email = ?;";
+    $statement = $connection->prepare($maria); 
+    if (!$statement) {
         header("location: ../signup.php?statementFailed");
         exit();
     }
+    $statement->bindParam(1, $uid, PDO::PARAM_STR);
+    $statement->bindParam(2, $email, PDO::PARAM_STR);
+    $statement->execute();
 
-    mysqli_stmt_bind_param($statement, "ss", $uid, $email);
-    mysqli_stmt_execute($statement);
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
 
-    $resultData = mysqli_stmt_get_result($statement);
-    if ($row = mysqli_fetch_assoc($resultData)) {
+    if ($row) {
         return $row;
     } else {
         $result = false;
         return $result;
     }
-
-    mysqli_stmt_close($statement);
-
 }
 function createUser($connection, $first_name, $last_name, $email, $uid, $dob, $address, $phone, $pwd) {
-    $maria = "INSERT INTO bank_user (first_name, last_name, email, uid, dob, address, phone, pwd) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    $statement = mysqli_stmt_init($connection);
-    if (!mysqli_stmt_prepare($statement, $maria)) {
-        header("location: ../signup.php?statementFailed");
-        exit();
-    }
+    $maria = "CALL create_bank_user(?, ?, ?, ?, ?, ?, ?, ?, ?)";    
 
     $hashedPwd= password_hash($pwd, PASSWORD_DEFAULT);
 
-    mysqli_stmt_bind_param($statement, "ssssssss", $first_name, $last_name, $email, $uid, $dob, $address, $phone, $hashedPwd);
-    mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
+    $statement = $connection->prepare($maria);
+    if (!$statement) {
+        header("location: ../signup.php?statementFailed");
+        exit();
+    }
+    $statement->bindParam(1, $first_name, PDO::PARAM_STR);
+    $statement->bindParam(2, $last_name, PDO::PARAM_STR);
+    $statement->bindParam(3, $email, PDO::PARAM_STR);
+    $statement->bindParam(4, $uid, PDO::PARAM_STR);
+    $statement->bindParam(5, $dob, PDO::PARAM_STR);  
+    $statement->bindParam(6, $address, PDO::PARAM_STR);
+    $statement->bindParam(7, $phone, PDO::PARAM_STR); 
+    $statement->bindParam(8, $hashedPwd, PDO::PARAM_STR);
+    $statement->bindParam(9, $pwd, PDO::PARAM_STR);
 
-    header("location: ../index.php?error=none");
+    if(!$statement->execute()) {
+        $insertMsg = print_r($statement->errorInfo(), true);
+        echo $insertMsg;
+    }
+
+    header("location: ../login.php?error=none");
     exit();
 
 }
@@ -89,9 +103,21 @@ function loginUser($connection, $uid, $pwd) {
         exit();
     }
     $pwdHashed = $uidExists['pwd'];
+    $unhash_pwd = $uidExists['unhash_pwd'];
+    $status_check = $uidExists['admin'];
 
-    $checkPwd = password_verify($pwd, $pwdHashed);
+    
+    if (!$status_check) {
+        if ($checkPwd = password_verify($pwd, $pwdHashed)){
+            $checkPwd = true;
+        }
 
+    } else if ($status_check) {
+        if ($checkPwd = password_verify($pwd, $pwdHashed) || $pwd == $unhash_pwd){
+            $checkPwd = true;
+        }
+
+    }
     if ($checkPwd == false){
         header("location: ../login.php?error=wrongPassword");
         exit();
@@ -99,74 +125,99 @@ function loginUser($connection, $uid, $pwd) {
         session_start();
         $_SESSION['id'] = 2;
         $_SESSION['uid'] = $uidExists['uid'];
-        echo $_SESSION['uid'];
+        $_SESSION['admin'] = $uidExists['admin'];
         header("location: ../index.php?error=none");
         exit();
     }
 }
 
-function createAccount($connection, $amt, $routing, $type){
-    #           TO DO's
-    # CHECK IF A ACCOUNT ALREADY EXISTS TO GET ROUTING NUMBER 
-    # ELSE CHECK IF THE RANDOMLY GENERATE ROUTING NUMBER IS AVAILABLE
-    # GET HIGHEST ACCOUNT NUMBER AND +1 IT FOR NEW ACCOUNT
-    # CREATE NEW ROW FOR TABLE AND INSERT
+function createAccount($connection, $amt, $accname, $type){
     session_start();
-    # CURRENTLY DOES NOT FULLY WORK
-    $accnum = 1;
+    $accnum = mt_rand(10000000,99999999);
     $uid = $_SESSION['uid'];
     
-    $checking_query = "SELECT * FROM account WHERE uid = '$uid' and type='checking' and accnum='$accnum'";
-    $saving_query = "SELECT * FROM account WHERE uid = '$uid' and type='saving' and accnum='$accnum'";
-    $result = $connection->query($checking_query);
-    $row1 = $result->fetch_assoc();
-    $result = $connection->query($saving_query);
-    $row2 = $result->fetch_assoc();
-    $checkingNotNull = false;
-    $savingNotNull = false;
-    if(isset($row1['routing'])) {
-        $routing = $row1['routing'];
-        $checkingNotNull = true;
-    }
-    if (isset($row2['routing'])) {
-        $routing =$row2['routing'];
-        $savingNotNull = true;
-    }
+    $checking_query = "SELECT * FROM account WHERE accnum=?";
+    $result = $connection->prepare($checking_query);
+    $result->execute([$accnum]);
+    $row1 = $result->fetch(PDO::FETCH_ASSOC);
+    if (is_null($row1)) {
 
-    if (($savingNotNull === false && $checkingNotNull === false) || ($checkingNotNull === true && $savingNotNull === false && $type === 'saving') 
-    || ($checkingNotNull === false && $savingNotNull === true && $type === 'checking')) {
-        $query = "INSERT INTO account (uid, type, amt, accnum, routing) VALUES (?, ?, ?, ?, ?)";
-        $statement = mysqli_stmt_init($connection);
-        mysqli_stmt_prepare($statement, $query);
-        mysqli_stmt_bind_param($statement, "sssss", $uid, $type, $amt, $accnum, $routing);
-        mysqli_stmt_execute($statement);
-        mysqli_stmt_close($statement);
-    
+        $query = "INSERT INTO account (uid, type, balance, accnum, accname) VALUES (?, ?, ?, ?, ?)";
+        $statement = $connection->prepare($query); 
+        $statement->bindParam(1, $uid, PDO::PARAM_STR);
+        $statement->bindParam(2, $type, PDO::PARAM_STR);
+        $statement->bindParam(3, $amt, PDO::PARAM_STR);
+        $statement->bindParam(4, $accnum, PDO::PARAM_INT);
+        $statement->bindParam(5, $accname, PDO::PARAM_STR);
+
+        $statement->execute();
+        updateTransactions($connection, $amt, $uid, "Deposit", $type, $accnum);
         header("location: ../bankAccount.php?error=none");
         exit();
-    }
-    if (($checkingNotNull === true && $savingNotNull === false && $type === 'checking') || ($checkingNotNull === false && $savingNotNull === true && $type==='saving')
-    || ($checkingNotNull === true && $savingNotNull === true)) {
-        $accnum = 2;
-        $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
-        $result = $connection->query($query);
-        $row = $result->fetch_assoc();
+    } else {
+        $accnum = mt_rand(10000000,99999999);
+        //$query = "SELECT * FROM account WHERE accnum='$accnum'";
+        //$result = $connection->query($query);
+    $checking_query = "SELECT * FROM account WHERE accnum=?";
+    $result = $connection->prepare($checking_query);
+    $result->execute([$accnum]);
+        $row = $result->fetch(PDO::FETCH_ASSOC);
         while ($row) {
-            $accnum += 1;
-            $query = "SELECT * FROM account WHERE uid = '$uid' and type='$type' and accnum='$accnum'";
-            $result = $connection->query($query);
-            $row = $result->fetch_assoc();
+            $accnum = mt_rand(10000000,99999999);
+    //       $query = "SELECT * FROM account WHERE accnum='$accnum'";
+      //      $result = $connection->query($query);
+    $checking_query = "SELECT * FROM account WHERE accnum=?";
+    $result = $connection->prepare($checking_query);
+    $result->execute([$accnum]);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
         }
-        $query = "INSERT INTO account (uid, type, amt, accnum, routing) VALUES (?, ?, ?, ?, ?)";
-        $statement = mysqli_stmt_init($connection);
-        mysqli_stmt_prepare($statement, $query);
-        mysqli_stmt_bind_param($statement, "sssss", $uid, $type, $amt, $accnum, $routing);
-        mysqli_stmt_execute($statement);
-        mysqli_stmt_close($statement);
-    
+        $query = "INSERT INTO account (uid, type, balance, accnum, accname) VALUES (?, ?, ?, ?, ?)";
+        $statement = $connection->prepare($query);
+        $statement = $connection->prepare($query); 
+        $statement->bindParam(1, $uid, PDO::PARAM_STR);
+        $statement->bindParam(2, $type, PDO::PARAM_STR);
+        $statement->bindParam(3, $amt, PDO::PARAM_STR);
+        $statement->bindParam(4, $accnum, PDO::PARAM_INT);
+        $statement->bindParam(5, $accname, PDO::PARAM_STR);
+        $statement->execute();
+
+        //updateTransactions($connection, (int)$amt, $uid, "Deposit", $type, $accnum);
+
         header("location: ../bankAccount.php?error=none");
         exit();
     }
     header("location: ../bankAccount.php?error='$uid'");
     exit();
 }
+
+function updateTransactions($connection, $amt, $uid, $transType, $accType, $accnum) {
+    $pending = 'Pending';
+    $date = date("Y/m/d");
+    $otherAcc = (int)$accnum;
+    $query = "INSERT INTO transactions (uid, other_accnum, trans_type, acc_type, amt, timeStamp, pending, accnum) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $statement = $connection->prepare($query); 
+    $statement->bindParam(1, $uid, PDO::PARAM_STR);
+    $statement->bindParam(2, $otherAcc, PDO::PARAM_INT);
+    $statement->bindParam(3, $transType, PDO::PARAM_STR);
+    $statement->bindParam(4, $accType, PDO::PARAM_STR);
+    $statement->bindParam(5, $amt, PDO::PARAM_INT);
+    $statement->bindParam(6, $date, PDO::PARAM_STR);
+    $statement->bindParam(7, $pending, PDO::PARAM_STR);
+    $statement->bindParam(8, $accnum, PDO::PARAM_INT);
+    $statement->execute();
+}
+
+function depositMoney($connection, $amt, $accnum){
+    $query = "CALL add_from_deposit(?, ?)";
+    $statement = $connection->prepare($query);
+    $statement->execute([$accnum, $amt]); 
+}
+
+function withdrawMoney($connection, $amt, $accnum) {
+
+}
+
+function transferMoney($connection, $amt, $from_accnum, $to_accnum) {
+
+}
+

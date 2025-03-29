@@ -1,11 +1,14 @@
 <?php
+try {
+    $options= array();
+    $connection = new PDO("mysql:host=localhost;dbname=bams", "bams", "Kehx14wlix", $options);
 
-$connection = new mysqli('localhost', 'root', '', 'testdb');
+    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-if (mysqli_connect_errno()) {
-    echo "<p>Failed to connect to MariaDB: " . mysqli_connect_error() . "</p>";
+} catch (PDOException $error) {
+    header("location: ../index.php?error=DBConnectionFailed");
     exit();
+    die('Connection failed: ' . $error->getMessage());
 }
-
 ?>
